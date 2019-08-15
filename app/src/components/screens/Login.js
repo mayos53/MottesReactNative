@@ -3,7 +3,7 @@ import { StyleSheet, Text, TextInput, View, Button } from 'react-native';
 import { sizeWidth,sizeHeight} from '../utils/Size';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import {login} from '../redux/login/LoginAction';
+import {login, checkSession} from '../redux/login/LoginAction';
 import {navigateToPage} from '../../NavigationAction';
 import {saveToken, getToken} from '../utils/Store';
 
@@ -18,7 +18,7 @@ class Login extends React.Component {
 
   componentWillReceiveProps(newProps) {
       if(newProps.error == null){
-          this.handleToken()
+          this.handleToken(false)
       }else{
           this.setState({error:newProps.error})
       }
@@ -31,19 +31,22 @@ class Login extends React.Component {
     super();
     this.state = {}
     this.onPressLogin = this.onPressLogin.bind(this);
-    this.handleToken()
-
-
+    this.handleToken(true)
   }
 
-  handleToken(){
+  handleToken(firstTime){
     getToken().then((token)=>{
         if(token != null){
-          const resetAction = StackActions.reset({
-              index: 0,
-              actions: [NavigationActions.navigate({ routeName: 'Home' })],
-            });
-          this.props.navigation.dispatch(resetAction);
+          console.log("first time "+firstTime)
+          if(firstTime){
+              this.props.checkSession(token)
+          }else{
+              const resetAction = StackActions.reset({
+                  index: 0,
+                  actions: [NavigationActions.navigate({ routeName: 'Home' })],
+                });
+              this.props.navigation.dispatch(resetAction);
+          }
         }
     })
 
@@ -136,7 +139,7 @@ const mapStateToProps = state => ({
 
 function mapDispatchToProps(dispatch) {
     return {
-        ...bindActionCreators({login}, dispatch)
+        ...bindActionCreators({login, checkSession}, dispatch)
     }
 }
 

@@ -26,6 +26,26 @@ export function login(user, password) {
   }
 }
 
+export function checkSession(token) {
+  return (dispatch) => {
+    dispatch(loginBegin());
+    console.log("TOKEN "+token)
+    var headers = new Headers();
+    headers.append("Authorization", "Basic " + token);
+    fetch("http://www.tensiograph.com/webservice/api.php?json",
+          {headers:headers})
+      .then(handleErrors)
+      .then(res => res.json())
+      .then(json => {
+        dispatch(loginSuccess(token));
+        return json;
+      })
+      .catch(error => dispatch(loginFailure(error)));
+
+
+  }
+}
+
 
 export const loginBegin = () => {
   console.log("login")

@@ -6,7 +6,9 @@ import { bindActionCreators } from 'redux';
 import { getMeasurements } from "../redux/measurements/MeasurementsAction";
 import { Table, Row, Rows } from 'react-native-table-component';
 import { LineChart, Grid, XAxis, YAxis } from 'react-native-svg-charts'
-import { Circle, Path } from 'react-native-svg'
+import { G, Line, Circle, Path, Rect } from 'react-native-svg'
+import {Dimensions } from "react-native";
+
 
 
 
@@ -107,54 +109,195 @@ renderList(){
   renderChart(data1, data2){
 
     data1_values = []
-    for (var key in data1) {
-       data1_values.push(parseInt(data1[key]))
-    }
-
     data1_dates = []
+    data2_values = []
+
+
+    let stepLine = 1 * this.state.nbDays
+    let stepIndicators = 4 * this.state.nbDays
+    let stepAxis = 16 * this.state.nbDays
+
+    var min1 = 10000000
+    var min2 = 10000000
+
+    var max1 = 0
+    var max2 = 0
+
     for (var key in data1) {
-       data1_dates.push(key)
+         data1_dates.push(key)
+         data1_values.push(parseInt(data1[key]))
+         data2_values.push(parseInt(data2[key]))
+
+         if(parseInt(data1[key]) < min1){
+            min1 = parseInt(data1[key])
+         }
+
+         if(parseInt(data1[key]) > max1){
+            max1 = parseInt(data1[key])
+         }
+
+         if(parseInt(data2[key]) < min2){
+            min2 = parseInt(data2[key])
+         }
+
+         if(parseInt(data2[key]) > max2){
+            max2 = parseInt(data2[key])
+         }
+         // console.log(min1+" "+max1)
     }
 
-    data1_dates =  data1_dates.slice(1,6)
+
+   baseHeight = 230
+   range1 = max1 - min1
+   range2 = max2 - min2
+
+   range2Smaller = range2 < range1
+   smallHeight = baseHeight * (range2Smaller ? (range2 / range1) : (range1 / range2))
+   if(isNaN(smallHeight)){
+      smallHeight = 0
+   }
+
+
+    console.log("small height "+smallHeight)
+
+
+
+
+
+
+
+
+
+
 
 
 
 
     // const data = [ 50, 10, 40, 95, -4, -24, 85, 91, 35, 53, -53, 24, 50, -20, -80 ]
-    const data = data1_values.slice(1,6)
 
     const axesSvg = { fontSize: 10, fill: 'grey' };
-    const axesXSvg = { fontSize: 10, fill: 'black', rotation: 90};
+    const axesXSvg = { fontSize: 10, fill: 'black', rotation: 90, originY:35, y:30};
     const verticalContentInset = { top: 10, bottom: 10 }
-    const xAxisHeight = 200
+    const xAxisHeight = 100
+
+    const Decorator1 = ({ x, y, data }) => {
+            return data.map((value, index) => {
+                return (index % stepIndicators != 0) ? null :
+                <Circle
+                    key={ index }
+                    cx={ x(index) }
+                    cy={ y(value) }
+                    r={ 2 }
+                    stroke={ '#006600' }
+                    fill={ '#8DB388' }
+
+
+                />
+            })
+        }
+
+    const Decorator2 = ({ x, y, data }) => {
+            return data.map((value, index) => {
+                return (index % stepIndicators != 0) ? null :
+                <Circle
+                    key={ index }
+                    cx={ x(index) }
+                    cy={ y(value) }
+                    r={ 2 }
+                    stroke={ '#56FF78' }
+                    fill={ '#CDFFD1' }
+
+
+                />
+            })
+        }
+
+
+
+   const screenWidth = Math.round(Dimensions.get('window').width);
+
+
+
+
     return(
-        <View style={{ height: 470, padding: 20, flexDirection: 'row' }}>
+        <View style={{ height: 370, padding: 20, flexDirection: 'row' }}>
             <YAxis
-                data={data}
+                data={data1_values.concat(data2_values)}
                 style={{ marginBottom: xAxisHeight }}
                 contentInset={verticalContentInset}
                 svg={axesSvg}
             />
             <View style={{ flex: 1, marginLeft: 10 }}>
-                <LineChart
-                    style={{ flex: 1 }}
-                    data={data}
-                    contentInset={verticalContentInset}
-                    svg={{ stroke: 'rgb(134, 65, 244)' }}
-                >
-                    <Grid/>
-                </LineChart>
+                <View style= {{flex: 1}}>
+                    <LineChart
+                        style={{height: range2Smaller? baseHeight: smallHeight}}
+                        data={data1_values}
+                        contentInset={verticalContentInset}
+                        svg={{ stroke: '#006600' }}
+                    >
+                        <Decorator1/>
+                        {this.renderGrid(range2Smaller, stepAxis)}
+
+                    </LineChart>
+
+                    <LineChart
+                        style={{height: range2Smaller? smallHeight: baseHeight, marginTop:-smallHeight}}
+                        data={data2_values}
+                        contentInset={verticalContentInset}
+                        svg={{ stroke: '#56FF78' }}
+                    >
+                        <Decorator2/>
+                        {this.renderGrid(!range2Smaller, stepAxis)}
+
+                    </LineChart>
+
+                </View>
                 <XAxis
-                    style={{ marginHorizontal: -10, height: xAxisHeight }}
-                    data={data1_dates}
-                    formatLabel={(index) => data1_dates[index]}
-                    contentInset={{ left: 10, right: 10 }}
+                    style={{ height: xAxisHeight}}
+                    data={data2_values}
+                    formatLabel={(index) => {return (index % stepAxis != 0) ? "": data1_dates[index]}}
                     svg={axesXSvg}
                 />
             </View>
         </View>
       )
+  }
+
+  renderGrid(range2Smaller, stepAxis){
+    const CustomGrid = ({x, y, data, ticks}) => (
+        <G>
+            {
+                // Horizontal grid
+                ticks.map(tick => (
+
+                    <Line
+                        key={tick}
+                        x1={'0%'}
+                        x2={'100%'}
+                        y1={y(tick)}
+                        y2={y(tick)}
+                        stroke={'rgba(0,0,0,0.2)'}
+                    />
+                ))
+            }
+            {
+                // Vertical grid
+                data.map((value, index) => {
+                    return (index % stepAxis != 0) ? null :
+                    <Line
+                        key={index}
+                        y1={'0%'}
+                        y2={'100%'}
+                        x1={x(index)}
+                        x2={x(index)}
+                        stroke={'rgba(0,0,0,0.2)'}
+                        strokeDasharray={[2, 2]}
+                    />
+                })
+            }
+        </G>
+    );
+    return range2Smaller? <CustomGrid belowChart={true}/>: null
   }
 
   renderPicker(){

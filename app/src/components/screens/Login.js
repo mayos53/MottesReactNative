@@ -1,11 +1,14 @@
 import React from 'react';
-import { StyleSheet, Text, TextInput, View, Button } from 'react-native';
+import { StyleSheet, Text, TextInput, View, Button, Image, Picker } from 'react-native';
 import { sizeWidth,sizeHeight} from '../utils/Size';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {login, checkSession} from '../redux/login/LoginAction';
 import {navigateToPage} from '../../NavigationAction';
 import {saveToken, getToken} from '../utils/Store';
+import {strings} from '../utils/Strings';
+
+
 
 import {
       StackActions,NavigationActions
@@ -22,6 +25,7 @@ class Login extends React.Component {
       }else{
           this.setState({error:newProps.error})
       }
+
 
   }
 
@@ -60,14 +64,17 @@ class Login extends React.Component {
     const { navigation } = this.props;
     let errorText = this.state.error && <Text style={styles.labelError}>Wrong credentials</Text>
     return (
+
       <View style={styles.container}>
-          <Text style={styles.label}>username</Text>
+
+          <Image style= {{marginBottom:20}} source={require('../../../res/images/mottes.png')}/>
+          <Text style={styles.label}>{strings.username}</Text>
           <View style={styles.inputContainer}>
             <TextInput style={styles.input}
                       onChangeText={(text) => this.setState({username:text})}
             />
           </View>
-          <Text style={styles.label}>password</Text>
+          <Text style={styles.label}>{strings.password}</Text>
           <View style={styles.inputContainer}>
             <TextInput style={styles.input}
                        onChangeText={(text) => this.setState({password:text})}/>
@@ -78,7 +85,30 @@ class Login extends React.Component {
                   onPress={this.onPressLogin}
           />
 
+          <View style ={{marginTop: 30, alignItems:'center'}}>
+
+            <Picker
+                style ={{marginTop: 20}}
+                selectedValue={strings.getLanguage()}
+                style={{ height: 50, width: 200 }}
+                onValueChange={(itemValue, itemIndex) => {
+                          strings.setLanguage(itemValue)
+                          this.setState({language: itemValue})
+                        }}>
+                <Picker.Item label="🇬🇧 English" value="en" />
+                <Picker.Item label="🇮🇱 Hebrew" value="iw" />
+                <Picker.Item label="🇪🇸  Spanish" value="es" />
+                <Picker.Item label="🇫🇷  Français" value="fr" />
+                <Picker.Item label="🇮🇹 Italiano" value="it" />
+                <Picker.Item label="🇷🇺 русский" value="ru" />
+
+
+            </Picker>
+          </View>
+
       </View>
+
+
     );
   }
 

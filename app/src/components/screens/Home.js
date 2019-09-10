@@ -4,11 +4,16 @@ import { sizeWidth,sizeHeight} from '../utils/Size';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getUnits } from "../redux/units/UnitsAction";
+import {strings} from '../utils/Strings';
 
 
 
 
 export class Home extends React.Component {
+
+  static navigationOptions = {
+    title: strings.units
+  };
 
   componentDidMount() {
     this.props.getUnits();
@@ -26,9 +31,9 @@ export class Home extends React.Component {
       this.props.loading? <Text>Loading</Text> :
       <FlatList
           data= {this.props.units}
-          renderItem={({item}) => {
+          renderItem={({item,index}) => {
             return(
-                <TouchableOpacity onPress={() => this._onPress(item)}>
+                <TouchableOpacity onPress={() => this._onPress(item,index)}>
                     <Text style={styles.item} >{item.unit_full_name}</Text>
                 </TouchableOpacity>
               )
@@ -37,10 +42,12 @@ export class Home extends React.Component {
     );
 }
 
-_onPress(item) {
+_onPress(item, index) {
    this.props.navigation.navigate('Measurements', {
      unit_id: item.unit_id,
      unit_name: item.unit_full_name,
+     unit_index: index,
+     units: this.props.units
    });
  }
 }

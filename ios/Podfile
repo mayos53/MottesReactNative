@@ -30,6 +30,8 @@ target 'MottesReactNative' do
 
   pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
 
+  pod 'ReactNativeLocalization', :path => '../node_modules/react-native-localization'
+
   target 'MottesReactNativeTests' do
     inherit! :search_paths
     # Pods for testing

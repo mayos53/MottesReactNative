@@ -1,5 +1,6 @@
 import React from 'react';
 import { Picker, ScrollView, StyleSheet, Text, TextInput, View, Button, FlatList,TouchableOpacity } from 'react-native';
+import RNPickerSelect from 'react-native-picker-select';
 import { sizeWidth,sizeHeight} from '../utils/Size';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -59,13 +60,18 @@ export class Measurements extends React.Component {
 
 
     console.log("loading "+this.props.loading)
-    data1 = null
-    data2 = null
+    data = []
+    var colors = ['#006601','#5CFF82', '#023399','#128DD9', '#986601','#FFCC02','#FF3400','#9933CC']
+
     if(this.props.data != null && !Array.isArray(this.props.data.data)){
-        data1 = this.props.data.data["1"].data;
-        data2 = this.props.data.data["2"].data;
+      let nbData = Object.keys(this.props.data.data).length;
+      for(i=0;i< nbData;i++){
+        data.push({...this.props.data.data[""+(i+1)+""],
+                   color:colors[i]})
+      }
+
     }
-    return  <View onLayout={(event) =>{
+    return  <View style={{flex:1,flexDirection:'column'}} onLayout={(event) =>{
                             let isPortrait = Dimensions.get('window').width < Dimensions.get('window').height
                             // this.props.navigation.setParams({header: null});
                             this.setState({  isPortrait : isPortrait})
@@ -73,14 +79,40 @@ export class Measurements extends React.Component {
                {this.renderHeader()}
                {this.props.loading?
                     this.renderLoading():
-                      ((data1 == null || data2 == null)?
+                      (data.length == 0)?
                           null :
                           (this.state.isChart?
-                              this.renderChart(data1, data2):
-                              this.renderTable(data1, data2)))}
+                              this.renderChart(data):
+                              this.renderTable(data))}
+               {this.state.isChart? this.renderLegend():null}
                {this.renderUnitsChooser()}
              </View>
 
+  }
+
+  renderLegend(){
+
+    if(!this.state.isPortrait){
+      return null
+    }
+
+    var rows = []
+    for(var i=0;i < data.length; i+=3){
+      rows.push(<View style={{flex:1, flexDirection:'row', height:15,justifyContent:'space-around'}}>
+
+      {i<=data.length-1?<Text style={{fontSize:12, color:data[i].color}}> {'◊ '+data[i].name} </Text>:null}
+
+      {i+1<=data.length-1?<Text style={{fontSize:12, color:data[i+1].color}}> {'◊ '+data[i+1].name} </Text>:null}
+      {i+2<=data.length-1?<Text style={{fontSize:12, color:data[i+2].color}}> {'◊ '+data[i+2].name} </Text>:null}
+
+          </View>)
+
+
+    }
+
+    return <View style={{height:60,borderColor:'grey',borderWidth:1,marginLeft:20,marginRight:20,padding:5, justifyContent:'center'}}>
+        {rows}
+    </View>
   }
 
   fetchMeasurements(){
@@ -88,8 +120,9 @@ export class Measurements extends React.Component {
   }
 
   renderHeader(){
-    return this.state.isPortrait ? <View style={{flex:1, flexDirection:"row", marginTop:10, marginBottom:30}}>
+    return this.state.isPortrait ? <View style={{flexDirection:"row", marginTop:10,height:30}}>
         {this.renderPicker()}
+        <Text>{strings.nbDays}</Text>
         {this.renderChooseView()}
      </View> : null
   }
@@ -100,19 +133,26 @@ export class Measurements extends React.Component {
     return <Text>Loading</Text>
   }
 
- renderTable(data1, data2){
-    keys = []
-    for (var key in data1) {
+ renderTable(data){
+    var keys = []
+    for (var key in data[0].data) {
        keys.push(key)
     }
 
-    rows = []
+    var rows = []
     keys.forEach(function(key) {
-        rows.push([key, data1[key], data2[key]] )
+        row = [key]
+        for(i=0;i<data.length;i++){
+          row.push(data[i].data[key])
+        }
+        rows.push(row)
     })
-    var head = ['Date and time','1\n15cm.','2\n30cm.']
+    var head = ['Date and time']
+    for(i=0;i<data.length;i++){
+      head.push(data[i].sensor_id+"\n"+data[i].depth+" cm")
+    }
     return (
-        <View style={{height:370, marginBottom:20, marginTop:20}}>
+        <View style={{height:360, marginBottom:20, marginTop:20}}>
             <Table borderStyle={{borderWidth: 1, borderColor: '#000000'}}>
               <Row data={head} style={styles.head} textStyle={styles.text}/>
             </Table>
@@ -126,10 +166,9 @@ export class Measurements extends React.Component {
   }
 
 
-  renderChart(data1, data2){
+  renderChart(data){
 
-    return <Chart data1={data1}
-                  data2={data2}
+    return <Chart data={data}
                   nbDays = {this.state.nbDays}
                   isPortrait= {this.state.isPortrait}/>
 
@@ -190,23 +229,41 @@ export class Measurements extends React.Component {
   }
 
   renderUnitsChooser(){
+    if(this.state.unitId == null){
+      return null
+    }
+
+    if(!this.state.isPortrait){
+      return null
+    }
 
     let units = this.props.navigation.getParam("units")
     let data = units.map( (unit) => {
-            return <Picker.Item key={unit.unit_id} value={unit.unit_id} label={unit.unit_full_name} />
+            return { value:unit.unit_id, label:unit.unit_full_name}
         });
 
-      return        <Picker
-            style ={{alignSelf:'center', marginTop: 20, height: 50, width: 300 }}
-            selectedValue={this.state.unitId}
-            onValueChange={(itemValue, itemIndex) => {
-                         this.setUnit(itemIndex)
-                    }}>
 
-            {data}
+      return  <View style = {{marginLeft:20}}>
+      <RNPickerSelect
+                style={{
+                    ...pickerSelectStyles,
+                    iconContainer: {
+                      top: 10,
+                      right: 12,
+                    },
+                  }}
+                                value={this.state.unitId}
+                onValueChange={(itemValue, itemIndex) => {
+                        if(itemIndex > 0){
+                            this.setUnit(itemIndex-1)
+                        }
+                    }}
+                    items = {data}
+                  />
+                  </View>
 
 
-        </Picker>
+
 
   }
 
@@ -225,23 +282,30 @@ export class Measurements extends React.Component {
 
   renderPicker(){
     return (<View style = {styles.pickerContainer}>
-        <Picker
-         selectedValue={this.state.nbDays}
-         style={{height: 50, width: 90}}
+        <RNPickerSelect
+         value={this.state.nbDays}
+         style={{
+             ...pickerSelectStyles,
+             iconContainer: {
+               top: 10,
+               right: 12,
+             },
+           }}
+         items={[{label:"1 "+strings.days,value:1},
+                  {label:"3 "+strings.days,value:3},
+                  {label:"6 "+strings.days,value:6},
+                  {label:"10 "+strings.days,value:10},
+                  {label:"14 "+strings.days,value:14}
+              ]}
          onValueChange={(itemValue, itemIndex) =>{
                   this.setState({nbDays: itemValue, tooltipX:undefined },()=>{
                       this.fetchMeasurements()
                     })
               }
          }>
-             <Picker.Item label="1" value="1" />
-             <Picker.Item label="3" value="3" />
-             <Picker.Item label="6" value="6" />
-             <Picker.Item label="10" value="10" />
-             <Picker.Item label="14" value="14" />
 
-         </Picker>
-         <Text>{strings.days}</Text>
+         </RNPickerSelect>
+
     </View>)
   }
 
@@ -261,11 +325,35 @@ export class Measurements extends React.Component {
 }
 
 
+const pickerSelectStyles = StyleSheet.create({
+      inputIOS: {
+      fontSize: 16,
+      paddingVertical: 12,
+      paddingHorizontal: 10,
+      borderWidth: 1,
+      borderColor: 'gray',
+      borderRadius: 4,
+      color: 'blue',
+      paddingRight: 30, // to ensure the text is never behind the icon
+      },
+      inputAndroid: {
+      fontSize: 16,
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      borderWidth: 0.5,
+      borderColor: 'purple',
+      borderRadius: 8,
+      color: 'blue',
+      paddingRight: 30, // to ensure the text is never behind the icon
+      },
+});
+
+
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: '#fff' },
   head: { height: 40, backgroundColor: '#ccff32' },
   text: { margin: 6 },
-  pickerContainer: {flexDirection:'row', alignItems:'center',justifyContent:'center',width: 300,height:40}
+  pickerContainer: { marginLeft:20, width: 140,height:40}
 });
 
 

@@ -27,71 +27,146 @@ export class TooltipComponent extends React.Component {
       this.state={
           tooltipX: null,
           tooltipY: null,
-          tooltipIndex:null
+          tooltipIndex:null,
+          dataIndex:0,
+          width:1,
+          height:1
 
       }
   }
-  componentWillReceiveProps(newProps) {
-      this.setState({
-          tooltipX: newProps.tooltipX,
-          tooltipY: newProps.tooltipY,
-          tooltipIndex:newProps.tooltipIndex
+  // componentWillReceiveProps(newProps) {
+  //     this.setState({
+  //         tooltipX: newProps.tooltipX,
+  //         tooltipY: newProps.tooltipY,
+  //         tooltipIndex:newProps.tooltipIndex
+  //
+  //     })
+  //
+  // }
 
-      })
+  render() {
+    const verticalContentInset = { top: 10, bottom: 10 }
+    return   <View style={{position:'absolute',height: this.props.height, left:0,right:0}}
+                   onLayout={(event) =>{
+                            this.setState({width: event.nativeEvent.layout.width,
+                                           height: event.nativeEvent.layout.height
+                                          })
+                          }}>
+
+                          <Svg width={this.state.width} height={this.state.height}>
+                              <Rect
+                                 x={0}
+                                 y={0}
+                                 height={this.state.height}
+                                 width={this.state.width}
+                                 fill={ '#00000000' }
+                                 onPress= {(event) => {
+                                     let res = this.findClosestPoint(event.nativeEvent.locationX, event.nativeEvent.locationY)
+                                     this.setState(res)
+                                   }
+                                 }
+                                 />
+
+                                 <Tooltip
+                                        x = {this.state.x}
+                                        y = {this.state.y}
+                                        tooltipX={this.state.tooltipX}
+                                        tooltipY={this.state.tooltipY}
+                                        data2= {this.props.dataX}
+                                        index={this.state.tooltipIndex}
+                                        color={this.props.colors[this.state.dataIndex]}
+                                 />
+                            </Svg>
+
+
+
+               </View>
 
   }
 
-  render() {
+  findClosestPoint(x, y){
 
-    return <LineChart
-          style={{height: this.props.height, marginTop:this.props.marginTop}}
-          data={this.props.dataY}
-          svg={{ stroke: '#00000000' }}>
-              <Tooltip
-                  tooltipX={this.state.tooltipX}
-                  tooltipY={this.state.tooltipY}
-                  data2= {this.props.dataX}
-                  index={this.state.tooltipIndex}
-                  color='#006600'
-                  />
-              <Decorator strokeColor='#006600'
-                         fillColor = '#8DB388'
-                         onPress= {(index,value) =>
+    var index = Math.round(x * this.props.dataX.length / this.state.width)
+    var value = y
 
+    let range = 5
 
-                                      this.setState({
-                                        tooltipX: index,
-                                        tooltipY: value,
-                                        tooltipIndex: index,
-                                        tooltipX2: null,
-                                      })
-                                    }
+    // var startIndex = index - range/2 < 0 ? 0: (index - range/2)
+    // var endIndex = index + range/2 > this.props.dataX.length - 1 ? this.props.dataX.length-1:(index + range/2)
+    var minDistance = 100000
+    var minIndex = -1
+    var dataIndex = 0
 
-                             />
-    </LineChart>
+    var indices = []
+
+    indices[0] = index
+    var i = 0;
+    while(i<range/2){
+      if(i> 0){
+       indices[i] = index - i
+      }
+       if(i< this.props.dataX.length - 1){
+         indices[i+1] = index + i
+       }
+     i++
+    }
+    for(var k=0;k<=indices.length;k++){
+      i = indices[k]
+      for(var j=0;j<this.props.dataY.length;j++){
+          var value_calculated = this.props.value_maxs[j] - (value - this.props.margins[j]) / this.props.factors[j]
+          var distance = Math.abs(this.props.dataY[j][i] - value_calculated)
+          var threshold = 40/this.props.factors[j]
+          if(distance < threshold && value_calculated >= this.props.value_mins[j] && value_calculated <= this.props.value_maxs[j] && distance < minDistance){
+             minDistance = distance
+             dataIndex = j
+             minIndex = i
+          }
+      }
+    }
+    let verticalContentInset = 0
+
+  return  minIndex >=0 ?
+          {
+            tooltipX : minIndex,
+            tooltipY : this.props.dataY[dataIndex][minIndex],
+            x: minIndex * this.state.width / this.props.dataX.length,
+            y: (this.props.value_maxs[dataIndex] - this.props.dataY[dataIndex][minIndex]) * this.props.factors[dataIndex] + this.props.margins[dataIndex] + verticalContentInset ,
+            tooltipIndex: minIndex,
+            dataIndex: dataIndex
+          }:{
+            tooltipX : null,
+            tooltipY : null,
+            tooltipIndex: null,
+            dataIndex: null
+          }
+
 
 
   }
 }
 
 
+
+
 const Decorator = ({ x, y, data, strokeColor, fillColor, onPress }) => {
         return data.map((value, index) => {
-            return  <G width={20} height={20}
+            return  <G width={20} height={baseHeight}
                 onPress= {(event) => {
-                    onPress(event,value)
+                    onPress(index, event.nativeEvent.locationY)
                   }
                 }>
               <Rect
                  key={ index }
                  x={ x(index) - 10 }
-                 y={y(value)-10}
-                 height={ 20 }
+                 y={0}
+                 height={ baseHeight }
                  width={20}
                  fill={ '#00000000' }
 
 
              />
+
+
 
 
             </G>

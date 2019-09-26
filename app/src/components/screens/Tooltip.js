@@ -19,9 +19,9 @@ const Tooltip = ({
 
   console.log("tooltipX: "+tooltipX+" tooltipY: "+tooltipY)
   return (
-    (tooltipX != undefined) ? <G x={x(tooltipX)} y={y(tooltipY)}>
+    (tooltipX != undefined) ? <G x={x} y={y}>
       <G>
-        <Rect x={0} y={0} height={22} width={100} stroke={color} fill={'white'}  />
+        <Rect x={0} y={0} height={22} width={110} stroke={color} fill={'white'}  />
         <Text x={2} y={14} fontSize='12' stroke={color}>
           {data2[index]+" , "+tooltipY}
         </Text>

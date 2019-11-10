@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Error: Unable to resolve module `./index.bundle` from ``: <br><br>None of these files exist:<br> &nbsp;* index.bundle(.native|.ios.js|.native.js|.js|.ios.json|.native.json|.json|.ios.ts|.native.ts|.ts|.ios.tsx|.native.tsx|.tsx)<br> &nbsp;* index.bundle/index(.native|.ios.js|.native.js|.js|.ios.json|.native.json|.json|.ios.ts|.native.ts|.ts|.ios.tsx|.native.tsx|.tsx)<br> &nbsp; &nbsp;at ModuleResolver.resolveDependency (/Users/yossi/Documents/Projects/MottesReactNative/node_modules/metro/src/node-haste/DependencyGraph/ModuleResolution.js:163:15)<br> &nbsp; &nbsp;at ResolutionRequest.resolveDependency (/Users/yossi/Documents/Projects/MottesReactNative/node_modules/metro/src/node-haste/DependencyGraph/ResolutionRequest.js:52:18)<br> &nbsp; &nbsp;at DependencyGraph.resolveDependency (/Users/yossi/Documents/Projects/MottesReactNative/node_modules/metro/src/node-haste/DependencyGraph.js:282:16)<br> &nbsp; &nbsp;at /Users/yossi/Documents/Projects/MottesReactNative/node_modules/metro/src/lib/transformHelpers.js:267:42<br> &nbsp; &nbsp;at Server.&lt;anonymous&gt; (/Users/yossi/Documents/Projects/MottesReactNative/node_modules/metro/src/Server.js:1088:41)<br> &nbsp; &nbsp;at Generator.next (&lt;anonymous&gt;)<br> &nbsp; &nbsp;at asyncGeneratorStep (/Users/yossi/Documents/Projects/MottesReactNative/node_modules/metro/src/Server.js:99:24)<br> &nbsp; &nbsp;at _next (/Users/yossi/Documents/Projects/MottesReactNative/node_modules/metro/src/Server.js:119:9)</pre>
+</body>
+</html>

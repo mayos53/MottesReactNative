@@ -9,6 +9,8 @@ import {strings} from '../utils/Strings';
 
 
 
+
+
 export class Home extends React.Component {
 
   static navigationOptions = {
@@ -27,6 +29,7 @@ export class Home extends React.Component {
   }
 
   render() {
+
     return (
       this.props.loading? <Text>Loading</Text> :
       <FlatList

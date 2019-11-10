@@ -9,6 +9,9 @@ import loginReducer from './components/redux/login/LoginReducer';
 import measurementsReducer from './components/redux/measurements/MeasurementsReducer';
 
 
+
+
+
 const reducers = combineReducers({login:loginReducer,
                                   units:unitsReducer,
                                   measurements:measurementsReducer});
@@ -17,6 +20,7 @@ const store = createStore(reducers, applyMiddleware(thunk));
 
 export default class App extends React.Component {
   render() {
+
     console.disableYellowBox = true;
     return(
       <Provider store={ store }>

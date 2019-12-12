@@ -332,7 +332,7 @@ export class Chart extends React.Component {
                      style={{position:'absolute', height: heights[i],left:0, right:0, top: margins[i]}}
                      data={data_values[i]}
                      contentInset={verticalContentInset}
-                     svg={{ stroke: colors[i] }}>
+                     svg={{ stroke: colors[i] , strokeWidth:2}}>
                      <Decorator
                        strokeColor = {colors[i]}
                        fillColor = {'#FFFFFFFF'}
@@ -461,7 +461,7 @@ const Decorator = ({ x, y, data, strokeColor, fillColor, stepIndicators }) => {
                   key={ index }
                   cx={ x(index) }
                   cy={ y(value) }
-                  r={ 1 }
+                  r={ 1.5 }
                   stroke={ strokeColor }
                   fill={ fillColor }
 

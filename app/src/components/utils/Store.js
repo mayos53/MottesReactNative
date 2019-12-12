@@ -5,7 +5,13 @@ import {
 const KEY_TOKEN = 'access_token';
 
 
-export const saveToken = (token) => AsyncStorage.setItem(KEY_TOKEN, token);
+export const saveToken = (token) => {
+  if(token != null){
+    AsyncStorage.setItem(KEY_TOKEN, token)
+  }else{
+    AsyncStorage.removeItem(KEY_TOKEN)
+  }
+}
 
 
 export const getToken = () => {

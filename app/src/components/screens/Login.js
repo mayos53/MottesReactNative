@@ -80,15 +80,14 @@ class Login extends React.Component {
                        onChangeText={(text) => this.setState({password:text})}/>
           </View>
           {errorText}
-          <Button title="Login"
+          <Button title={strings.login}
                   style={styles.button}
                   onPress={this.onPressLogin}
           />
 
           <View style ={{marginTop: 30, alignItems:'center'}}>
-
+            <Text style ={{marginTop: 20}}>{strings.choose_language}</Text>
             <Picker
-                style ={{marginTop: 20}}
                 selectedValue={strings.getLanguage()}
                 style={{ height: 50, width: 200 }}
                 onValueChange={(itemValue, itemIndex) => {

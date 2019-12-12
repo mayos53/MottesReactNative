@@ -1,10 +1,15 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, View, Button, FlatList,TouchableOpacity } from 'react-native';
-import { sizeWidth,sizeHeight} from '../utils/Size';
+import { width, height,sizeWidth,sizeHeight} from '../utils/Size';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getUnits } from "../redux/units/UnitsAction";
 import {strings} from '../utils/Strings';
+import moment from 'moment';
+import {saveToken} from "../utils/Store";
+
+
+
 
 
 
@@ -17,8 +22,12 @@ export class Home extends React.Component {
     title: strings.units
   };
 
+
+
   componentDidMount() {
+
     this.props.getUnits();
+
   }
 
   componentWillReceiveProps(newProps) {
@@ -31,18 +40,56 @@ export class Home extends React.Component {
   render() {
 
     return (
-      this.props.loading? <Text>Loading</Text> :
-      <FlatList
-          data= {this.props.units}
-          renderItem={({item,index}) => {
-            return(
-                <TouchableOpacity onPress={() => this._onPress(item,index)}>
-                    <Text style={styles.item} >{item.unit_full_name}</Text>
-                </TouchableOpacity>
-              )
-          }
-      }/>
+      this.props.loading? <Text>{strings.loading}</Text> :
+      <View>
+          <View style={{flexDirection:'row',backgroundColor: '#ccff32'}}>
+            <Text style={{textAlign:'center',padding:sizeWidth(2),width:3*width/4,borderWidth:1}} >{strings.unit_name}</Text>
+            <Text style={{textAlign:'center',padding:sizeWidth(2),width:width/4,borderWidth:1}} >{strings.last_message}</Text>
+          </View>
+          <FlatList
+              data= {this.props.units}
+              renderItem={({item,index}) => {
+                return(
+
+                    <TouchableOpacity onPress={() => this._onPress(item,index)}>
+                        <View style={{flexDirection:'row'}}>
+                          <Text style={{textAlign:'left',padding:sizeWidth(5),width:3*width/4,borderWidth:1}} >{item.unit_full_name}</Text>
+                          <Text style={{textAlign:'left',padding:sizeWidth(5),width:width/4,borderWidth:1}} >{this.formatDate(item.last_message)}</Text>
+                        </View>
+                    </TouchableOpacity>
+                  )
+              }
+          }/>
+
+          <Button title={strings.logout}
+                  style={styles.button}
+                  onPress={()=>{saveToken(null)
+                                this.props.navigation.navigate('Login')}}>
+          </Button>
+
+      </View>
     );
+}
+
+onPressLogout() {
+    saveToken(null)
+    this.props.navigation.navigate('Login')
+}
+
+formatDate(dateStr){
+    if(dateStr != null && dateStr!= ""){
+      today = moment().toDate()
+      momentDate = moment(dateStr,'YYYY-MM-DD HH:mm:ss')
+      date = momentDate.toDate()
+
+      if(today.getDate() == date.getDate()
+        && today.getMonth() == date.getMonth()
+        && today.getFullYear() == date.getFullYear()){
+            return momentDate.format("HH:mm")
+        }else{
+            return momentDate.format("DD/MM")
+        }
+    }
 }
 
 _onPress(item, index) {
@@ -78,13 +125,15 @@ const styles = StyleSheet.create({
     width: sizeWidth(80),
   },
 
-  button:{
-    marginTop: sizeHeight(1),
-    width: sizeWidth(80)
-  },
 
   item:{
-    padding: sizeWidth(5)
+    padding: sizeWidth(5),
+    textAlign:'left'
+  },
+
+  button:{
+    marginTop: sizeHeight(5),
+    width: sizeWidth(80)
   }
 
 

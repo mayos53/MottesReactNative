@@ -76,7 +76,7 @@ export class Measurements extends React.Component {
                             // this.props.navigation.setParams({header: null});
                             this.setState({  isPortrait : isPortrait})
                           }}>
-               {this.renderHeader()}
+               {this.props.loading?null:this.renderHeader()}
                {this.props.loading?
                     this.renderLoading():
                       (data.length == 0)?
@@ -120,17 +120,30 @@ export class Measurements extends React.Component {
   }
 
   renderHeader(){
-    return this.state.isPortrait ? <View style={{flexDirection:"row", marginTop:10,height:30}}>
+    let units = this.props.navigation.getParam("units")
+    var leftImage = this.state.unitIndex > 0 ? require('../../../res/images/1leftarrow.png') :
+                                               require('../../../res/images/gray_leftarrow.png')
+    var rightImage = this.state.unitIndex < units.length - 1 ? require('../../../res/images/1rightarrow.png') :
+                                               require('../../../res/images/gray_rightarrow.png')
+
+    return this.state.isPortrait ?
+    <View style={{flexDirection:"row", marginTop:10,height:30}}>
+        <TouchableOpacity style={{marginLeft:10}} onPress={()=>{this.onSwipeLeft()}}>
+          <Image source={leftImage}/>
+        </TouchableOpacity>
         {this.renderPicker()}
         <Text>{strings.nbDays}</Text>
         {this.renderChooseView()}
+        <TouchableOpacity style={{marginRight:10}} onPress={()=>{this.onSwipeRight()}}>
+          <Image source={rightImage}/>
+        </TouchableOpacity>
      </View> : null
   }
 
 
 
   renderLoading(){
-    return <Text>Loading</Text>
+    return <Text>{strings.loading}</Text>
   }
 
  renderTable(data){
@@ -149,7 +162,7 @@ export class Measurements extends React.Component {
     })
     var head = ['Date and time']
     for(i=0;i<data.length;i++){
-      head.push(data[i].sensor_id+"\n"+data[i].depth+" cm")
+      head.push(data[i].name)
     }
     return (
         <View style={{height:360, marginBottom:20, marginTop:20}}>
@@ -175,22 +188,22 @@ export class Measurements extends React.Component {
 
   }
 
-  // onSwipeLeft() {
-  //
-  //   console.log('swipe left '+this.state.unitIndex)
-  //   let units = this.props.navigation.getParam("units")
-  //   if(this.state.unitIndex < units.length - 1){
-  //       this.setUnit(this.state.unitIndex+1)
-  //   }
-  //
-  // }
-  //
-  // onSwipeRight(gestureState) {
-  //   console.log('swipe right '+this.state.unitIndex)
-  //   if(this.state.unitIndex > 0){
-  //       this.setUnit(this.state.unitIndex-1)
-  //   }
-  // }
+  onSwipeRight() {
+
+    console.log('swipe left '+this.state.unitIndex)
+    let units = this.props.navigation.getParam("units")
+    if(this.state.unitIndex < units.length - 1){
+        this.setUnit(this.state.unitIndex+1)
+    }
+
+  }
+
+  onSwipeLeft() {
+    console.log('swipe right '+this.state.unitIndex)
+    if(this.state.unitIndex > 0){
+        this.setUnit(this.state.unitIndex-1)
+    }
+  }
 
   renderGrid(range2Smaller, stepAxis){
     const CustomGrid = ({x, y, data, ticks}) => (

@@ -7,6 +7,8 @@ import { getUnits } from "../redux/units/UnitsAction";
 import {strings} from '../utils/Strings';
 import moment from 'moment';
 import {saveToken} from "../utils/Store";
+import { NavigationActions, StackActions } from 'react-navigation';
+
 
 
 
@@ -64,7 +66,13 @@ export class Home extends React.Component {
           <Button title={strings.logout}
                   style={styles.button}
                   onPress={()=>{saveToken(null)
-                                this.props.navigation.navigate('Login')}}>
+                    const resetAction = StackActions.reset({
+                  index: 0,
+                  actions: [NavigationActions.navigate({ routeName: 'Login' })],
+              });
+
+  this.props.navigation.dispatch(resetAction);
+                                }}>
           </Button>
 
       </View>

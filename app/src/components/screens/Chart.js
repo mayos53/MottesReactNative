@@ -328,17 +328,19 @@ export class Chart extends React.Component {
    str = []
 
    for(i=0;i<data.length;i++){
-     str.push(<LineChart
-                     style={{position:'absolute', height: heights[i],left:0, right:0, top: margins[i]}}
-                     data={data_values[i]}
-                     contentInset={verticalContentInset}
-                     svg={{ stroke: colors[i] , strokeWidth:2}}>
-                     <Decorator
-                       strokeColor = {colors[i]}
-                       fillColor = {'#FFFFFFFF'}
-                       stepIndicators = {stepIndicators}
-                     />
-                 </LineChart>)
+     if(this.props.chart_displayed[i]){
+       str.push(<LineChart
+                       style={{position:'absolute', height: heights[i],left:0, right:0, top: margins[i]}}
+                       data={data_values[i]}
+                       contentInset={verticalContentInset}
+                       svg={{ stroke: colors[i] , strokeWidth:2}}>
+                       <Decorator
+                         strokeColor = {colors[i]}
+                         fillColor = {'#FFFFFFFF'}
+                         stepIndicators = {stepIndicators}
+                       />
+                   </LineChart>)
+    }
    }
 
    var grid_data = []

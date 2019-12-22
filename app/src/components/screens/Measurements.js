@@ -1,7 +1,7 @@
 import React from 'react';
 import { Picker, ScrollView, StyleSheet, Text, TextInput, View, Button, FlatList,TouchableOpacity } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
-import { sizeWidth,sizeHeight} from '../utils/Size';
+import { sizeWidth,sizeHeight,width} from '../utils/Size';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getMeasurements } from "../redux/measurements/MeasurementsAction";
@@ -13,7 +13,6 @@ import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 import Tooltip from './Tooltip'
 import TooltipComponent from './TooltipComponent'
 import Chart from './Chart'
-
 import {strings} from '../utils/Strings';
 import moment from 'moment';
 
@@ -37,7 +36,8 @@ export class Measurements extends React.Component {
       super();
       this.state = {nbDays: 1,
                     isChart:true,
-                    isPortrait : Dimensions.get('window').width <= Dimensions.get('window').height
+                    isPortrait : Dimensions.get('window').width <= Dimensions.get('window').height,
+                    chart_displayed:[]
                   }
       // this.onSwipeLeft.bind(this);
       // this.onSwipeRight.bind(this);
@@ -52,12 +52,17 @@ export class Measurements extends React.Component {
   }
 
   componentWillReceiveProps(newProps) {
-
+    chart_displayed = []
+    if(newProps.data != null && !Array.isArray(newProps.data.data)){
+      for(var d in newProps.data.data){
+        chart_displayed.push(true)
+      }
+    }
+    this.setState({chart_displayed:chart_displayed})
 
   }
 
   render() {
-
 
     console.log("loading "+this.props.loading)
     data = []
@@ -66,8 +71,9 @@ export class Measurements extends React.Component {
     if(this.props.data != null && !Array.isArray(this.props.data.data)){
       let nbData = Object.keys(this.props.data.data).length;
       for(i=0;i< nbData;i++){
-        data.push({...this.props.data.data[""+(i+1)+""],
-                   color:colors[i]})
+          data.push({...this.props.data.data[""+(i+1)+""],
+                     color:colors[i]})
+
       }
 
     }
@@ -84,26 +90,28 @@ export class Measurements extends React.Component {
                           (this.state.isChart?
                               this.renderChart(data):
                               this.renderTable(data))}
-               {this.state.isChart? this.renderLegend():null}
+               {this.state.isChart? this.renderLegend(data):null}
                {this.renderUnitsChooser()}
              </View>
 
   }
 
-  renderLegend(){
+  renderLegend(data){
 
     if(!this.state.isPortrait){
       return null
     }
 
+
     var rows = []
     for(var i=0;i < data.length; i+=3){
       rows.push(<View style={{flex:1, flexDirection:'row', height:15,justifyContent:'space-around'}}>
 
-      {i<=data.length-1?<Text style={{fontSize:12, color:data[i].color}}> {'◊ '+data[i].name} </Text>:null}
 
-      {i+1<=data.length-1?<Text style={{fontSize:12, color:data[i+1].color}}> {'◊ '+data[i+1].name} </Text>:null}
-      {i+2<=data.length-1?<Text style={{fontSize:12, color:data[i+2].color}}> {'◊ '+data[i+2].name} </Text>:null}
+
+      {i<=data.length-1   ? this.renderLegendItem(i):null}
+      {i+1<=data.length-1 ? this.renderLegendItem(i+1):null}
+      {i+2<=data.length-1 ? this.renderLegendItem(i+2):null}
 
           </View>)
 
@@ -113,6 +121,17 @@ export class Measurements extends React.Component {
     return <View style={{height:60,borderColor:'grey',borderWidth:1,marginLeft:20,marginRight:20,padding:5, justifyContent:'center'}}>
         {rows}
     </View>
+  }
+
+  renderLegendItem(index){
+    return <TouchableOpacity key={index} onPress={()=>this.onPressLegend(index)}><Text style={{fontSize:14, color:this.state.chart_displayed[index] ? data[index].color:'#cccccc'}}> {'◊ '+data[index].name} </Text></TouchableOpacity>
+  }
+
+  onPressLegend(index){
+      this.state.chart_displayed[index] = !this.state.chart_displayed[index]
+      this.setState({
+          chart_displayed: this.state.chart_displayed
+      })
   }
 
   fetchMeasurements(){
@@ -181,11 +200,11 @@ export class Measurements extends React.Component {
 
   renderChart(data){
 
-    return <Chart data={data}
-                  nbDays = {this.state.nbDays}
-                  isPortrait= {this.state.isPortrait}/>
 
-
+    return  <Chart data={data}
+                   chart_displayed = {this.state.chart_displayed}
+                   nbDays = {this.state.nbDays}
+                   isPortrait= {this.state.isPortrait}/>
   }
 
   onSwipeRight() {

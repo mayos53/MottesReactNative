@@ -15,6 +15,8 @@ import TooltipComponent from './TooltipComponent'
 import Chart from './Chart'
 import {strings} from '../utils/Strings';
 import moment from 'moment';
+import * as Progress from 'react-native-progress';
+
 
 
 
@@ -66,13 +68,15 @@ export class Measurements extends React.Component {
 
     console.log("loading "+this.props.loading)
     data = []
-    var colors = ['#006601','#5CFF82', '#023399','#128DD9', '#986601','#FFCC02','#FF3400','#9933CC']
+    var colors = ['#006601','#5CFF82', '#023399','#128DD9', '#986601','#FFCC02','#FF3400','#9933CC','#000000','#000000']
 
     if(this.props.data != null && !Array.isArray(this.props.data.data)){
       let nbData = Object.keys(this.props.data.data).length;
-      for(i=0;i< nbData;i++){
-          data.push({...this.props.data.data[""+(i+1)+""],
-                     color:colors[i]})
+      for(i=0;i<12;i++){
+          if(this.props.data.data[""+(i+1)+""] != null){
+              data.push({...this.props.data.data[""+(i+1)+""],
+                         color:colors[i]})
+          }
 
       }
 
@@ -86,11 +90,13 @@ export class Measurements extends React.Component {
                {this.props.loading?
                     this.renderLoading():
                       (data.length == 0)?
-                          null :
+                          <View style={{flex:1, alignItems:'center', justifyContent:'center'}}>
+                              <Text style={{fontSize:20}}> {strings.no_data}</Text>
+                          </View>:
                           (this.state.isChart?
                               this.renderChart(data):
                               this.renderTable(data))}
-               {this.state.isChart? this.renderLegend(data):null}
+               {data.length != 0 && this.state.isChart? this.renderLegend(data):null}
                {this.renderUnitsChooser()}
              </View>
 
@@ -124,7 +130,7 @@ export class Measurements extends React.Component {
   }
 
   renderLegendItem(index){
-    return <TouchableOpacity key={index} onPress={()=>this.onPressLegend(index)}><Text style={{fontSize:14, color:this.state.chart_displayed[index] ? data[index].color:'#cccccc'}}> {'◊ '+data[index].name} </Text></TouchableOpacity>
+    return <TouchableOpacity key={index} onPress={()=>this.onPressLegend(index)}><Text style={{fontSize:13, color:this.state.chart_displayed[index] ? data[index].color:'#cccccc'}}> {'◊ '+data[index].name} </Text></TouchableOpacity>
   }
 
   onPressLegend(index){
@@ -162,7 +168,8 @@ export class Measurements extends React.Component {
 
 
   renderLoading(){
-    return <Text>{strings.loading}</Text>
+    return <View style={{flex:1, alignItems:'center',justifyContent:'center'}}><Progress.Circle size={100} borderWidth={3} borderColor={'#006601'} indeterminate={true} /></View>
+
   }
 
  renderTable(data){

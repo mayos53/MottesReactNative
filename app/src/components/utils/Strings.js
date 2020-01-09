@@ -18,7 +18,8 @@ export const strings = new LocalizedStrings({
    last_message:"Last message",
    login:"Login",
    logout:"Logout",
-   loading:"Loading"
+   loading:"Loading",
+   no_data:"No data"
 
  },
  iw:{
@@ -34,7 +35,9 @@ export const strings = new LocalizedStrings({
    last_message:"הודעה אחרונה",
    login:"כניסה",
    logout:"יציאה",
-   loading:"טוען"
+   loading:"טוען",
+   no_data:"אין נתונים"
+
 
  },
  es:{
@@ -50,7 +53,9 @@ export const strings = new LocalizedStrings({
    last_message:"Last message",
    login:"Login",
    logout:"Logout",
-   loading:"Loading"
+   loading:"Loading",
+   no_data:"No data"
+
 
  },
  fr:{
@@ -66,7 +71,9 @@ export const strings = new LocalizedStrings({
    last_message:"Dernier message",
    login:"Entrer",
    logout:"Sortir",
-   loading:"Chargement en cours"
+   loading:"Chargement en cours",
+   no_data:"No data"
+
 
  },
  it:{
@@ -82,7 +89,9 @@ export const strings = new LocalizedStrings({
    last_message:"Last message",
    login:"Login",
    logout:"Logout",
-   loading:"Loading"
+   loading:"Loading",
+   no_data:"No data"
+
 
  },
  ru:{
@@ -98,7 +107,9 @@ export const strings = new LocalizedStrings({
    last_message:"Last message",
    login:"Login",
    logout:"Logout",
-   loading:"Loading"
+   loading:"Loading",
+   no_data:"No data"
+
 
  }
 

@@ -4,6 +4,7 @@ import { width, height,sizeWidth,sizeHeight} from '../utils/Size';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getUnits } from "../redux/units/UnitsAction";
+
 import {strings} from '../utils/Strings';
 import moment from 'moment';
 import {saveToken} from "../utils/Store";
@@ -43,11 +44,31 @@ export class Home extends React.Component {
 
     return (
       this.props.loading? <Text>{strings.loading}</Text> :
-      <View>
+      <View style={{flex:1}}>
+      <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+            <TouchableOpacity onPress={()=>{
+                this.props.getUnits();
+            }}>
+                <Text style={styles.button2}>{strings.refresh}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={()=>{
+              saveToken(null)
+              const resetAction = StackActions.reset({
+                  index: 0,
+                  actions: [NavigationActions.navigate({ routeName: 'Login' })],
+              });
+              this.props.navigation.dispatch(resetAction);
+            }}>
+                <Text style={styles.button}>{strings.logout}</Text>
+            </TouchableOpacity>
+      </View>
+
           <View style={{flexDirection:'row',backgroundColor: '#ccff32'}}>
             <Text style={{textAlign:'center',padding:sizeWidth(2),width:3*width/4,borderWidth:1}} >{strings.unit_name}</Text>
             <Text style={{textAlign:'center',padding:sizeWidth(2),width:width/4,borderWidth:1}} >{strings.last_message}</Text>
           </View>
+
           <FlatList
               data= {this.props.units}
               renderItem={({item,index}) => {
@@ -61,27 +82,25 @@ export class Home extends React.Component {
                     </TouchableOpacity>
                   )
               }
-          }/>
+          }
 
-          <Button title={strings.logout}
-                  style={styles.button}
-                  onPress={()=>{saveToken(null)
-                    const resetAction = StackActions.reset({
-                  index: 0,
-                  actions: [NavigationActions.navigate({ routeName: 'Login' })],
-              });
+          />
 
-  this.props.navigation.dispatch(resetAction);
-                                }}>
-          </Button>
+
 
       </View>
     );
 }
 
 onPressLogout() {
-    saveToken(null)
-    this.props.navigation.navigate('Login')
+    saveToken(null).then(()=>{
+      const resetAction = StackActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({ routeName: 'Login' })],
+        });
+      this.props.navigation.dispatch(resetAction);
+    })
+    // this.props.navigation.navigate('Login')
 }
 
 formatDate(dateStr){
@@ -89,7 +108,7 @@ formatDate(dateStr){
       today = moment().toDate()
       momentDate = moment(dateStr,'YYYY-MM-DD HH:mm:ss')
       date = momentDate.toDate()
-
+      console.log(today)
       if(today.getDate() == date.getDate()
         && today.getMonth() == date.getMonth()
         && today.getFullYear() == date.getFullYear()){
@@ -140,8 +159,22 @@ const styles = StyleSheet.create({
   },
 
   button:{
-    marginTop: sizeHeight(5),
-    width: sizeWidth(80)
+    padding:sizeWidth(2),
+    width:sizeWidth(20),
+    textAlign:'center',
+    borderWidth:1,
+    margin:10,
+    backgroundColor:'red',
+    color:'white'
+  },
+  button2:{
+    padding:sizeWidth(2),
+    width:sizeWidth(20),
+    textAlign:'center',
+    borderWidth:1,
+    margin:10,
+    backgroundColor:'green',
+    color:'white'
   }
 
 

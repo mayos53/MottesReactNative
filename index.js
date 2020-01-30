@@ -1,10 +1,11 @@
 /**
  * @format
  */
+ import 'react-native-gesture-handler'
+
 
 import {AppRegistry} from 'react-native';
 import App from './app/src/App';
-import 'react-native-gesture-handler'
 import {name as appName} from './app.json';
 
 import { Client } from 'bugsnag-react-native';

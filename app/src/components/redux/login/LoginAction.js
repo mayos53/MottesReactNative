@@ -1,4 +1,4 @@
-import {ACTION_LOGIN, ACTION_LOGIN_SUCCESS, ACTION_LOGIN_ERROR} from "../Action";
+import {ACTION_LOGIN, ACTION_LOGIN_SUCCESS, ACTION_LOGIN_ERROR, ACTION_LOGOUT} from "../Action";
 import {saveToken,getToken} from "../../utils/Store";
 import base64 from 'react-native-base64'
 
@@ -47,12 +47,27 @@ export function checkSession(token) {
 }
 
 
+
+export function logout(){
+  return (dispatch) => {dispatch(performLogout)}
+};
+
+export const performLogout = () => {
+  console.log("logout")
+  return {
+    type: ACTION_LOGOUT,
+    payload:{token:null}
+  }
+};
+
 export const loginBegin = () => {
   console.log("login")
   return {
-    type: ACTION_LOGIN
+    type: ACTION_LOGIN,
+    payload:{token:null}
   }
 };
+
 
 export const loginSuccess = (token) => {
   console.log("loginSuccess")

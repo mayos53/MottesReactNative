@@ -1,3 +1,5 @@
+import 'react-native-gesture-handler'
+
 import React from 'react';
 import AppNavigator from './AppNavigator';
 import { Provider } from 'react-redux';
@@ -7,6 +9,7 @@ import thunk from 'redux-thunk';
 import unitsReducer from './components/redux/units/UnitsReducer';
 import loginReducer from './components/redux/login/LoginReducer';
 import measurementsReducer from './components/redux/measurements/MeasurementsReducer';
+
 
 
 

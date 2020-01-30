@@ -36,10 +36,11 @@ export class Measurements extends React.Component {
 
   constructor() {
       super();
-      this.state = {nbDays: 1,
+      this.state = {nbDays: 6,
                     isChart:true,
                     isPortrait : Dimensions.get('window').width <= Dimensions.get('window').height,
-                    chart_displayed:[]
+                    chart_displayed:[],
+                    offsetDays:0
                   }
       // this.onSwipeLeft.bind(this);
       // this.onSwipeRight.bind(this);
@@ -110,27 +111,26 @@ export class Measurements extends React.Component {
 
 
     var rows = []
-    for(var i=0;i < data.length; i+=3){
-      rows.push(<View style={{flex:1, flexDirection:'row', height:15,justifyContent:'space-around'}}>
+    for(var i=0;i < data.length; i+=2){
+      rows.push(<View style={{flex:1, flexDirection:'row', height:20,justifyContent:'space-around'}}>
 
 
 
       {i<=data.length-1   ? this.renderLegendItem(i):null}
       {i+1<=data.length-1 ? this.renderLegendItem(i+1):null}
-      {i+2<=data.length-1 ? this.renderLegendItem(i+2):null}
 
           </View>)
 
 
     }
 
-    return <View style={{height:60,borderColor:'grey',borderWidth:1,marginLeft:20,marginRight:20,padding:5, justifyContent:'center'}}>
+    return <View style={{height: (data.length/2 +(data.length % 2 != 0)) * 30,borderColor:'grey',borderWidth:1,marginLeft:20,marginRight:20,padding:5, justifyContent:'center'}}>
         {rows}
     </View>
   }
 
   renderLegendItem(index){
-    return <TouchableOpacity key={index} onPress={()=>this.onPressLegend(index)}><Text style={{fontSize:13, color:this.state.chart_displayed[index] ? data[index].color:'#cccccc'}}> {'◊ '+data[index].name} </Text></TouchableOpacity>
+    return <TouchableOpacity key={index} onPress={()=>this.onPressLegend(index)}><Text style={{fontSize:13, textStyle: this.state.chart_displayed[index] ? 'bold':'normal',marginBottom:5,color:this.state.chart_displayed[index] ? data[index].color:'#cccccc'}}> {'◊ '+data[index].name} </Text></TouchableOpacity>
   }
 
   onPressLegend(index){
@@ -141,25 +141,33 @@ export class Measurements extends React.Component {
   }
 
   fetchMeasurements(){
-    this.props.getMeasurements(this.state.unitId, this.state.nbDays);
+    this.props.getMeasurements(this.state.unitId, this.state.nbDays, this.state.offsetDays);
   }
 
   renderHeader(){
     let units = this.props.navigation.getParam("units")
-    var leftImage = this.state.unitIndex > 0 ? require('../../../res/images/1leftarrow.png') :
+    var leftImage = this.state.offsetDays < 0 ? require('../../../res/images/1leftarrow.png') :
                                                require('../../../res/images/gray_leftarrow.png')
-    var rightImage = this.state.unitIndex < units.length - 1 ? require('../../../res/images/1rightarrow.png') :
-                                               require('../../../res/images/gray_rightarrow.png')
+    var rightImage = require('../../../res/images/1rightarrow.png')
+
 
     return this.state.isPortrait ?
     <View style={{flexDirection:"row", marginTop:10,height:30}}>
-        <TouchableOpacity style={{marginLeft:10}} onPress={()=>{this.onSwipeLeft()}}>
+        <TouchableOpacity style={{padding:10,marginLeft:10}} onPress={()=>{this.onSwipeLeft()}}>
           <Image source={leftImage}/>
         </TouchableOpacity>
         {this.renderPicker()}
         <Text>{strings.nbDays}</Text>
         {this.renderChooseView()}
-        <TouchableOpacity style={{marginRight:10}} onPress={()=>{this.onSwipeRight()}}>
+        <View style={{flex:1}}>
+          <TouchableOpacity onPress={()=>{
+              this.fetchMeasurements();
+          }}>
+              <Text style={styles.button}>{strings.refresh}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={{padding:10,marginRight:10}} onPress={()=>{this.onSwipeRight()}}>
           <Image source={rightImage}/>
         </TouchableOpacity>
      </View> : null
@@ -215,20 +223,20 @@ export class Measurements extends React.Component {
   }
 
   onSwipeRight() {
-
-    console.log('swipe left '+this.state.unitIndex)
-    let units = this.props.navigation.getParam("units")
-    if(this.state.unitIndex < units.length - 1){
-        this.setUnit(this.state.unitIndex+1)
-    }
-
+    this.setState({offsetDays: --this.state.offsetDays},
+    () => {
+        this.fetchMeasurements()
+      })
   }
 
   onSwipeLeft() {
-    console.log('swipe right '+this.state.unitIndex)
-    if(this.state.unitIndex > 0){
-        this.setUnit(this.state.unitIndex-1)
+    if(this.state.offsetDays < 0){
+      this.setState({offsetDays: ++this.state.offsetDays},
+      () => {
+          this.fetchMeasurements()
+        })
     }
+
   }
 
   renderGrid(range2Smaller, stepAxis){
@@ -282,7 +290,7 @@ export class Measurements extends React.Component {
         });
 
 
-      return  <View style = {{marginLeft:20}}>
+      return  <View style = {{marginLeft:20,marginBottom:20}}>
       <RNPickerSelect
                 style={{
                     ...pickerSelectStyles,
@@ -319,9 +327,12 @@ export class Measurements extends React.Component {
 
 
 
+
+
   renderPicker(){
     return (<View style = {styles.pickerContainer}>
         <RNPickerSelect
+         useNativeAndroidPickerStyle={false}
          value={this.state.nbDays}
          style={{
              ...pickerSelectStyles,
@@ -329,6 +340,10 @@ export class Measurements extends React.Component {
                top: 10,
                right: 12,
              },
+             inputIOS:{
+               fontSize:18,
+               color:'blue'
+             }
            }}
          items={[{label:"1 "+strings.days,value:1},
                   {label:"3 "+strings.days,value:3},
@@ -352,7 +367,7 @@ export class Measurements extends React.Component {
     var text = this.state.isChart? strings.table : strings.chart
     var icon = this.state.isChart? require('../../../res/images/table.png') :
                                    require('../../../res/images/graph.png')
-    return <TouchableOpacity style={{flex:1, alignItems:'center', width:80, height:40}} onPress= {()=>{
+    return <TouchableOpacity style={{alignItems:'center', marginLeft:30, marginRight:30, height:40}} onPress= {()=>{
             this.setState({isChart: !this.state.isChart}
             )
         }}>
@@ -392,8 +407,14 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: '#fff' },
   head: { height: 40, backgroundColor: '#ccff32' },
   text: { margin: 6 },
-  pickerContainer: { marginLeft:20, width: 140,height:40}
-});
+  pickerContainer: { marginLeft:20, width: 100,height:40,justifyContent:'center'},
+  button:{padding:sizeWidth(2),
+    textAlign:'center',
+    borderWidth:1,
+    alignSelf:'center',
+    backgroundColor:'green',
+    color:'white'
+}});
 
 
 const mapStateToProps = state => ({

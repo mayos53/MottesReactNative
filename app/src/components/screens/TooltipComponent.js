@@ -46,6 +46,19 @@ export class TooltipComponent extends React.Component {
 
   render() {
     const verticalContentInset = { top: 10, bottom: 10 }
+    const tooltipWidth = 110
+    const tooltipHeight= 22
+
+    var offsetX = 0
+    var offsetY = 0
+    if(this.state.x+tooltipWidth > this.state.width){
+        --offsetX
+    }
+
+    if(this.state.y + tooltipHeight > this.state.height){
+       --offsetY
+    }
+
     return   <View style={{position:'absolute',height: this.props.height, left:0,right:0}}
                    onLayout={(event) =>{
                             this.setState({width: event.nativeEvent.layout.width,
@@ -70,6 +83,10 @@ export class TooltipComponent extends React.Component {
                                  <Tooltip
                                         x = {this.state.x}
                                         y = {this.state.y}
+                                        width = {tooltipWidth}
+                                        height = {tooltipHeight}
+                                        offsetX= {offsetX}
+                                        offsetY= {offsetY}
                                         tooltipX={this.state.tooltipX}
                                         tooltipY={this.state.tooltipY}
                                         data2= {this.props.dataX}
@@ -113,14 +130,16 @@ export class TooltipComponent extends React.Component {
     for(var k=0;k<=indices.length;k++){
       i = indices[k]
       for(var j=0;j<this.props.dataY.length;j++){
-          var value_calculated = this.props.value_maxs[j] - (value - this.props.margins[j]) / this.props.factors[j]
-          var distance = Math.abs(this.props.dataY[j][i] - value_calculated)
-          var threshold = 40/this.props.factors[j]
-          if(distance < threshold && value_calculated >= this.props.value_mins[j] && value_calculated <= this.props.value_maxs[j] && distance < minDistance){
-             minDistance = distance
-             dataIndex = j
-             minIndex = i
+          if(this.props.chart_displayed[j]){
+            var value_calculated = this.props.value_maxs[j] - (value - this.props.margins[j]) / this.props.factors[j]
+            var distance = Math.abs(this.props.dataY[j][i] - value_calculated)
+            var threshold = 40/this.props.factors[j]
+            if(distance < threshold && value_calculated >= this.props.value_mins[j] && value_calculated <= this.props.value_maxs[j] && distance < minDistance){
+               minDistance = distance
+               dataIndex = j
+               minIndex = i
           }
+        }
       }
     }
     let verticalContentInset = 0

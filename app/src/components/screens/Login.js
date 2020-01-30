@@ -25,9 +25,7 @@ class Login extends React.Component {
       }else{
           this.setState({error:newProps.error})
       }
-
-
-  }
+}
 
 
 

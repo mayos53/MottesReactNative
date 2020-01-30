@@ -12,6 +12,12 @@ initialState = {}
 
 export default function loginReducer(state = initialState, action) {
     switch (action.type) {
+        case ACTION_LOGIN:
+            return {
+                ...state,
+                token: null,
+                error: null
+            };
         case ACTION_LOGIN_ERROR:
             return {
                 ...state,

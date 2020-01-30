@@ -91,7 +91,9 @@ export class Chart extends React.Component {
     // data2_axis_values = []
 
     var indic = this.state.isPortrait ? 50 : 100
-    var axis = this.state.isPortrait ? 10 : 20
+    var axis = this.state.isPortrait ? 20 : 40
+
+
 
 
 
@@ -107,6 +109,8 @@ export class Chart extends React.Component {
     value_mins=[]
     value_maxs=[]
 
+
+
     for( i=0;i<data.length;i++){
       value_mins.push(100000000)
       value_maxs.push(-100000)
@@ -114,6 +118,7 @@ export class Chart extends React.Component {
       data_indicator_values.push([])
 
     }
+
 
     // var value_min1 = 10000000
     // var value_min2 = 10000000
@@ -131,6 +136,7 @@ export class Chart extends React.Component {
     // data1_indicators_dates.push("sddsa")
     // data1_indicators_values.push(0)
     // data2_indicators_values.push(0)
+
 
     for (var key in data[0].data) {
       var timeFormatted  = moment(key,'DD/MM/YYYY HH:mm').format('DD/MM HH:mm');//moment(key).format()
@@ -229,7 +235,7 @@ export class Chart extends React.Component {
     var total_range = max - min
     for(i=0;i<value_mins.length;i++){
         range = value_maxs[i] - value_mins[i]
-        factors[i] = baseHeight/total_range
+        factors[i] = baseHeight/total_range.toFixed(4)
         heights[i] = range * factors[i]
         margins[i] = (max - value_maxs[i]) * factors[i]
     }
@@ -310,7 +316,7 @@ export class Chart extends React.Component {
     const axesSvg = { fontSize: 10, fill: 'black' };
     const axesXSvg = { fontSize: 10, fill: 'black', rotation: 90, originY:35,y:30};
     const verticalContentInset = { top: 3, bottom: 3 }
-    const horizontalContentInset = { left: 0, right: 0 }
+    const horizontalContentInset = { left: 5, right: 5 }
 
     const xAxisHeight = 70
 
@@ -378,6 +384,7 @@ export class Chart extends React.Component {
                           height={baseHeight}
                           dataX={data_indicator_dates}
                           dataY={data_indicator_values}
+                          chart_displayed={this.props.chart_displayed}
                           margins = {margins}
                           value_mins = {value_mins}
                           value_maxs = {value_maxs}

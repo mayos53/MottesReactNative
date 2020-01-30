@@ -13,9 +13,10 @@ Date.prototype.addDays = function(days) {
     return date;
 }
 
-export function getMeasurements(unitId, nbDays) {
+export function getMeasurements(unitId, nbDays, offsetDays) {
   const date = new Date();
-  const startDate = moment(date).add(-nbDays, 'day').format("YYYY-MM-DD")
+  const startDate = moment(date).add(-nbDays+offsetDays*nbDays, 'day').format("YYYY-MM-DD")
+  const toDate =  moment(date).add(-nbDays+(offsetDays+1)*nbDays, 'day').format("YYYY-MM-DD")
 
   return (dispatch) => {
     dispatch(getMeasurementsBegin());
@@ -23,7 +24,7 @@ export function getMeasurements(unitId, nbDays) {
         var headers = new Headers();
         console.log("TOKEN "+token)
         headers.append("Authorization", "Basic " + token);
-        fetch("https://www.tensiograph.com/webservice/api.php?json&unit="+unitId+"&from="+startDate,//2&from=2019-07-10&to=2019-07-12",
+        fetch("https://www.tensiograph.com/webservice/api.php?json&unit="+unitId+"&from="+startDate+(offsetDays==0?"":"&to="+toDate),//2&from=2019-07-10&to=2019-07-12",
               {headers:headers})
           .then(handleErrors)
           .then(res => res.json())

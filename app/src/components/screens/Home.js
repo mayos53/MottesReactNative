@@ -25,6 +25,8 @@ export class Home extends React.Component {
     title: strings.units
   };
 
+  state = {offset:{x:0,y:0}}
+  offset = {x:0,y:0}
 
 
   componentDidMount() {
@@ -38,6 +40,15 @@ export class Home extends React.Component {
     //     const { navigate } = this.props.navigation;
     //     navigate("Login",{error:true})
     // }
+    // if(this.flatListRef != null && this.props.units != null){
+    //   this.flatListRef.scrollToIndex({animated: true, index: this.currentIndex})
+    // }
+    // this.setState({offset:this.offset})
+    setTimeout(()=>{
+        // some refresh process should come here
+        this.setState({offset: this.offset})
+        console.log("this.state "+this.offset.y)
+      }, 500)
   }
 
   render() {
@@ -47,7 +58,10 @@ export class Home extends React.Component {
       <View style={{flex:1}}>
       <View style={{flexDirection:'row',justifyContent:'space-between'}}>
             <TouchableOpacity onPress={()=>{
+                this.setState({offset: {x:0,y:0}})
                 this.props.getUnits();
+
+
             }}>
                 <Text style={styles.button2}>{strings.refresh}</Text>
             </TouchableOpacity>
@@ -71,6 +85,12 @@ export class Home extends React.Component {
 
           <FlatList
               data= {this.props.units}
+              ref={(ref) => { this.flatListRef = ref; }}
+              onScroll={(event)=>{
+                this.offset = event.nativeEvent.contentOffset
+                console.log('offset: '+this.offset.y)
+              }}
+              contentOffset={this.state.offset}
               renderItem={({item,index}) => {
                 return(
 
@@ -90,6 +110,15 @@ export class Home extends React.Component {
 
       </View>
     );
+}
+
+onViewableItemsChanged = ({ viewableItems, changed }) => {
+  // console.log("Visible items are", viewableItems);
+  // console.log("Changed in this iteration", changed);
+  //   if(viewableItems != null && viewableItems.length > 0){
+  //
+  //       this.setState({currentIndex:viewableItems
+  //   }
 }
 
 onPressLogout() {
@@ -160,7 +189,7 @@ const styles = StyleSheet.create({
 
   button:{
     padding:sizeWidth(2),
-    width:sizeWidth(20),
+    width:sizeWidth(30),
     textAlign:'center',
     borderWidth:1,
     margin:10,
@@ -169,7 +198,7 @@ const styles = StyleSheet.create({
   },
   button2:{
     padding:sizeWidth(2),
-    width:sizeWidth(20),
+    width:sizeWidth(30),
     textAlign:'center',
     borderWidth:1,
     margin:10,

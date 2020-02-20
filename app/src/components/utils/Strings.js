@@ -43,7 +43,7 @@ export const strings = new LocalizedStrings({
 
  },
  es:{
-   username:"Nombre de usuario",
+   username:"Usuario",
    password:"Contraseña",
    choose_language:"Elige lengua",
    table:"Tabla",
@@ -53,11 +53,11 @@ export const strings = new LocalizedStrings({
    language:"Idioma",
    unit_name:"Nombre de la unidad",
    last_message:"Ultimo mensaje",
-   login:"Iniciar sesión",
-   logout:"Cerrar sesión",
+   login:"Acceso al sistema",
+   logout:"Desconectar",
    loading:"Cargando",
    no_data:"Sin datos",
-   refresh:"actualizar"
+   refresh:"Actualizar"
 
 
 
@@ -73,8 +73,8 @@ export const strings = new LocalizedStrings({
    language:"Langue",
    unit_name:"Nom de l'unité",
    last_message:"Dernier message",
-   login:"Entrer",
-   logout:"Sortir",
+   login:"Accéder",
+   logout:"Déconnecter",
    loading:"Chargement en cours",
    no_data:"Pas de données",
    refresh:"Rafraichir"
@@ -83,37 +83,37 @@ export const strings = new LocalizedStrings({
  },
  it:{
    username:"Nome utente",
-   password:"Password",
+   password:"Parola d'ordine",
    choose_language:"Scegli la lingua",
    table:"Table",
-   chart:"Carta",
+   chart:"Grafico",
    units:"Unità",
    days:"Giornate",
    language:"Lingua",
    unit_name:"Nome unità",
    last_message:"Ultimo messaggio",
-   login:"Entra",
-   logout:"Disconnettersi",
+   login:"Accedi",
+   logout:"Disconnetti",
    loading:"Caricamento",
    no_data:"Nessun dato",
-   refresh:"ricaricare"
+   refresh:"Ricaricare"
 
 
 
  },
  ru:{
    username:"Имя пользователя",
-   password:"пароль",
+   password:"Пароль",
    choose_language:"Выберите язык",
    table:"Таблица",
-   chart:"Диаграмма",
+   chart:"График",
    units:"Единицы",
    days:"Дни",
    language:"Язык",
-   unit_name:"имя объекта",
+   unit_name:"Имя юнита",
    last_message:"Последнее сообщение",
    login:"Войти",
-   logout:"Выход",
+   logout:"Отключиться",
    loading:"Загрузка",
    no_data:"Нет данных",
    refresh:"обновление"

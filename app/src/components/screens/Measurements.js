@@ -112,7 +112,7 @@ export class Measurements extends React.Component {
 
     var rows = []
     for(var i=0;i < data.length; i+=2){
-      rows.push(<View style={{flex:1, flexDirection:'row', height:20,justifyContent:'space-around'}}>
+      rows.push(<View style={{flex:1, flexDirection:'row', height:20,justifyContent:'space-around',alignItems:'center'}}>
 
 
 
@@ -124,13 +124,13 @@ export class Measurements extends React.Component {
 
     }
 
-    return <View style={{height: (data.length/2 +(data.length % 2 != 0)) * 30,borderColor:'grey',borderWidth:1,marginLeft:20,marginRight:20,padding:5, justifyContent:'center'}}>
+    return <View style={{height: (data.length/2 +(data.length % 2 != 0)) * 40,borderColor:'grey',borderWidth:1,marginLeft:20,marginRight:20,padding:5, justifyContent:'center'}}>
         {rows}
     </View>
   }
 
   renderLegendItem(index){
-    return <TouchableOpacity key={index} onPress={()=>this.onPressLegend(index)}><Text style={{fontSize:13, textStyle: this.state.chart_displayed[index] ? 'bold':'normal',marginBottom:5,color:this.state.chart_displayed[index] ? data[index].color:'#cccccc'}}> {'◊ '+data[index].name} </Text></TouchableOpacity>
+    return <TouchableOpacity key={index} onPress={()=>this.onPressLegend(index)}><Text style={{fontSize:13, fontWeight: this.state.chart_displayed[index] ? '500':'normal',marginBottom:5,color:this.state.chart_displayed[index] ? data[index].color:'#cccccc'}}> {'◊ '+data[index].name} </Text></TouchableOpacity>
   }
 
   onPressLegend(index){
@@ -159,11 +159,11 @@ export class Measurements extends React.Component {
         {this.renderPicker()}
         <Text>{strings.nbDays}</Text>
         {this.renderChooseView()}
-        <View style={{flex:1}}>
-          <TouchableOpacity onPress={()=>{
+        <View style={{flex:1,alignItems:'center'}}>
+          <TouchableOpacity style={{width:sizeWidth(20)}} onPress={()=>{
               this.fetchMeasurements();
           }}>
-              <Text style={styles.button}>{strings.refresh}</Text>
+              <Text style={styles.button} numberOfLines={1} >{strings.refresh}</Text>
           </TouchableOpacity>
         </View>
 
@@ -330,7 +330,7 @@ export class Measurements extends React.Component {
 
 
   renderPicker(){
-    return (<View style = {styles.pickerContainer}>
+    return (<View style = {{...styles.pickerContainer,width:80}}>
         <RNPickerSelect
          useNativeAndroidPickerStyle={false}
          value={this.state.nbDays}
@@ -341,7 +341,7 @@ export class Measurements extends React.Component {
                right: 12,
              },
              inputIOS:{
-               fontSize:18,
+               fontSize:14,
                color:'blue'
              }
            }}
@@ -367,7 +367,7 @@ export class Measurements extends React.Component {
     var text = this.state.isChart? strings.table : strings.chart
     var icon = this.state.isChart? require('../../../res/images/table.png') :
                                    require('../../../res/images/graph.png')
-    return <TouchableOpacity style={{alignItems:'center', marginLeft:30, marginRight:30, height:40}} onPress= {()=>{
+    return <TouchableOpacity style={{alignItems:'center', marginLeft:20, marginRight:20, height:40}} onPress= {()=>{
             this.setState({isChart: !this.state.isChart}
             )
         }}>
@@ -407,12 +407,14 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: '#fff' },
   head: { height: 40, backgroundColor: '#ccff32' },
   text: { margin: 6 },
-  pickerContainer: { marginLeft:20, width: 100,height:40,justifyContent:'center'},
+  pickerContainer: { marginLeft:10, width: 80,height:40,justifyContent:'center'},
   button:{padding:sizeWidth(2),
     textAlign:'center',
     borderWidth:1,
+    width:sizeWidth(20),
     alignSelf:'center',
     backgroundColor:'green',
+    fontSize:12,
     color:'white'
 }});
 
